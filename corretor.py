@@ -8,6 +8,7 @@ from tkinter import ttk
 # Constantes
 TIMEOUT = 2
 SISTEMA = platform.system().lower()
+TEMA = 'clam'
 
 # Classes
 
@@ -246,8 +247,7 @@ class Corretor():
 
         # Tema e estilos
         style = ttk.Style()
-        temas = style.theme_names()
-        style.theme_use(temas[0])
+        style.theme_use(TEMA)
         style.configure('TFrame')
         style.configure('H2.TLabel', font='Arial 14')
         style.configure('H1.TLabel', font='Arial 16')
