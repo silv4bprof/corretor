@@ -248,7 +248,6 @@ class Corretor():
         # Tema e estilos
         style = ttk.Style()
         style.theme_use(TEMA)
-        style.configure('TFrame')
         style.configure('H2.TLabel', font='Arial 14')
         style.configure('H1.TLabel', font='Arial 16')
         style.configure('Verde.TButton', background='#9e9', bordercolor='#6b6',
