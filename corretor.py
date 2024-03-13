@@ -106,6 +106,7 @@ class Correcao:
             resposta = e.stdout.decode() if e.stdout else '\n'
             erro = f'Timeout de {TIMEOUT}s expirado.'
         # TODO: Revisar os códigos de erro no Windows e Linux
+        # TODO: Revisar os códigos de erro do PHP e Python
         if codigo == 0: # O script funcionou
             # Verifica a resposta
             _, erro = eval(self.func_expect)(resposta, self.args_expect)
