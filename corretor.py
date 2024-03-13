@@ -251,9 +251,12 @@ class Corretor():
         style.configure('TFrame')
         style.configure('H2.TLabel', font='Arial 14')
         style.configure('H1.TLabel', font='Arial 16')
-        style.configure('Verde.TButton', background='#9e9')
-        style.configure('Vermelho.TButton', background='#e99')
-        style.configure('Amarelo.TButton', background='#ee9')
+        style.configure('Verde.TButton', background='#9e9', bordercolor='#6b6',
+            lightcolor='#beb')
+        style.configure('Vermelho.TButton', background='#e99', bordercolor='#b66',
+            lightcolor='#ebb')
+        style.configure('Amarelo.TButton', background='#ee9', bordercolor='#bb6',
+            lightcolor='#eeb')
 
         # Lê o arquivo de configuração
         self.config = json.load(open(caminho_config, encoding='utf-8'))
