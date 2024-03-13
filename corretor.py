@@ -48,7 +48,7 @@ class Questao:
 class Correcao:
     '''Uma correcao de uma questão.'''
 
-    def __init__(self, comando: str, script: str, input_: str, cli_args: str, func_expect, args_expect: list):
+    def __init__(self, comando: str, script: str, input_: str, cli_args: str, func_expect, args_expect: list, msg_erro: str):
         '''Construtor.
         
         Parâmetros:
@@ -57,13 +57,16 @@ class Correcao:
         - `input_` é a entrada do teclado.
         - `cli_args` são os argumentos da linha de comando salvos no atributo `args`.
         - `func_expect` é a função que verifica a saída do script.
-        - `args_expect` são os argumentos da função que verifica a saída do script.'''
+        - `args_expect` são os argumentos da função que verifica a saída do script.
+        - `msg_erro` mensagem de erro amigável ao usuário.
+        '''
         self.comando: str = comando
         self.script: str = script
         self.input: str = input_.encode()
         self.args: str = cli_args
         self.func_expect: str = func_expect
         self.args_expect: str = args_expect
+        self.msg_erro: str = msg_erro
 
     @classmethod
     def ler_config(cls, comando: str, script: str, config_correcao: dict) -> 'Correcao':
@@ -72,11 +75,16 @@ class Correcao:
         Parâmetros:
         - `comando` e `script` são os mesmos da `Questao`.
         - `config_correcao` é o dict de uma correção (um elemento da lista "correcoes").'''
-        input_ = config_correcao.get('input', '')
-        args = config_correcao.get('args', '')
-        func_expect = config_correcao['teste']['func_expect']
-        args_expect = config_correcao['teste'].get('args_expect', '')
-        correcao = cls(comando, script, input_, args, func_expect, args_expect)
+        params = dict(
+            comando = comando,
+            script = script,
+            input_ = config_correcao.get('input', ''),
+            cli_args = config_correcao.get('args', ''),
+            func_expect = config_correcao['teste']['func_expect'],
+            args_expect = config_correcao['teste'].get('args_expect', ''),
+            msg_erro = config_correcao['teste'].get('msg_erro'),
+        )
+        correcao = cls(**params)
         return correcao
 
     @property
@@ -109,11 +117,13 @@ class Correcao:
         # TODO: Revisar os códigos de erro do PHP e Python
         if codigo == 0: # O script funcionou
             # Verifica a resposta
-            _, erro = eval(self.func_expect)(resposta, self.args_expect)
+            ok, erro = eval(self.func_expect)(resposta, self.args_expect)
+            if not ok and self.msg_erro:
+                erro = self.msg_erro
         elif codigo == 2: # File not found
             erro = f'Arquivo {self.script} não encontrado.'
         else:
-            erro = f'Erro ({codigo}) desconhecido.'
+            erro = f'(Código {codigo})\n' + erro
         return codigo, resposta, erro
 
 

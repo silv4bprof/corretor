@@ -27,7 +27,8 @@
                     "args" : "olá",
                     "teste" : {
                         "func_expect" : "testar_igual",
-                        "args_expect" : "isto deveria falhar"
+                        "args_expect" : "isto deveria falhar",
+                        "msg_erro" : "Isto é uma mensagem de erro"
                     }
                 }
             ]
@@ -40,7 +41,7 @@
                 {
                     "teste" : {
                         "func_expect" : "testar_igual",
-                        "args_expect" : "isto deveria dar erro de sintaxe"
+                        "msg_erro" : "isto deveria dar erro de sintaxe"
                     }
                 }
             ]
