@@ -1,0 +1,1 @@
+Arquivo com erro de sintaxe
