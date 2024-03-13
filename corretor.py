@@ -179,7 +179,7 @@ class ScrolledFrame(ttk.Frame):
     def __init__(self, parent, width, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         # Na raiz, é necessário um Canvas
-        canvas = tk.Canvas(self, width=width)
+        canvas = tk.Canvas(self, width=width, highlightthickness=0)
         scrollbar = ttk.Scrollbar(self, command=canvas.yview)
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.pack(anchor='center', side="left", expand=True)
