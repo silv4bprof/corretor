@@ -1,4 +1,4 @@
-import json, subprocess, tkinter as tk
+import json, platform, subprocess, tkinter as tk
 
 from tkinter import ttk
 
@@ -7,7 +7,7 @@ from tkinter import ttk
 
 # Constantes
 TIMEOUT = 2
-
+SISTEMA = platform.system().lower()
 
 # Classes
 
@@ -192,20 +192,30 @@ class ScrolledFrame(ttk.Frame):
         # Configura o Canvas para atualizar a scrollbar quando o tamanho muda
         conteudo.bind("<Configure>", self._on_resize)
         # Habilita o mouse wheel
-        canvas.bind_all("<Button-4>", self._on_mousewheel_up)
-        canvas.bind_all("<Button-5>", self._on_mousewheel_down)
+        if SISTEMA == 'windows':
+            canvas.bind_all("<MouseWheel>", self._on_mousewheel_windows)
+        else: # Linux
+            canvas.bind_all("<Button-4>", self._on_mousewheel_up_linux)
+            canvas.bind_all("<Button-5>", self._on_mousewheel_down_linux)
 
         # Guarda as referências no self
         self.canvas = canvas
         self.conteudo = conteudo
         self.parent = parent
 
-    def _on_mousewheel_up(self, event):
-        '''Sobe a view do `canvas`.'''
+    
+    def _on_mousewheel_windows(self, event):
+        '''Controla a view do `canvas` no Windows.'''
+        delta = event.delta
+        self.canvas.yview_scroll(delta // -120, "units")
+
+    def _on_mousewheel_up_linux(self, event):
+        '''Sobe a view do `canvas` no Linux.'''
+        # TODO: Considerar o delta
         self.canvas.yview_scroll(-1, "units")
 
-    def _on_mousewheel_down(self, event):
-        '''Desce a view do `canvas`.'''
+    def _on_mousewheel_down_linux(self, event):
+        '''Desce a view do `canvas` no Linux.'''
         self.canvas.yview_scroll(1, "units")
     
     def _on_resize(self, event):
