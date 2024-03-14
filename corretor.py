@@ -266,11 +266,11 @@ class Corretor():
         style.configure('H1.TLabel', font='Arial 16')
         style.configure('Fundo.TFrame', background='#bbb')
         style.configure('Verde.TButton', background='#9e9', bordercolor='#6b6',
-            lightcolor='#beb')
+            lightcolor='#beb', darkcolor='#393')
         style.configure('Vermelho.TButton', background='#e99', bordercolor='#b66',
-            lightcolor='#ebb')
+            lightcolor='#ebb', darkcolor='#933')
         style.configure('Amarelo.TButton', background='#ee9', bordercolor='#bb6',
-            lightcolor='#eeb')
+            lightcolor='#eeb', darkcolor='#993')
 
         # Lê o arquivo de configuração
         self.config = json.load(open(caminho_config, encoding='utf-8'))
