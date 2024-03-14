@@ -1,7 +1,7 @@
 import json, platform, subprocess, tkinter as tk
 
 from tkinter import ttk
-
+from tkinter.messagebox import showerror
 
 # MODELO
 
@@ -253,6 +253,9 @@ class Corretor():
         '''Construtor.
         `caminho_config` é o caminho para o arquivo json de configuração da correção.'''
         super().__init__()
+        # Tk lança erros em vez de exibir no terminal
+        tk.Tk.report_callback_exception = \
+            lambda root, _, val, tb : showerror("Error", message=str(val))
         janela = tk.Tk()
         self.janela = janela
 
@@ -288,7 +291,7 @@ class Corretor():
             style='Fundo.TFrame')
         self.frame_questoes.pack(fill=tk.BOTH)
         self._montar_questoes()
-    
+
     def _montar_frame_topo(self):
         '''Monta o frame do topo da tela.'''
         frame_topo = ttk.Frame(self.frame_principal, borderwidth=2, relief=tk.GROOVE)
