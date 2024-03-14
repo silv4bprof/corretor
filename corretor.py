@@ -187,7 +187,7 @@ class ScrolledText(tk.Text):
 class ScrolledFrame(ttk.Frame):
     '''Frame com scrollbar.
     *ATENÇÃO:* para colocar widgets dentro deste, passe o `.conteudo` deste como `parent` do widget filho.'''
-    def __init__(self, parent, width, *args, **kwargs):
+    def __init__(self, parent, width, conteudo_kwargs, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         # Na raiz, é necessário um Canvas
         canvas = tk.Canvas(self, width=width, highlightthickness=0)
@@ -197,7 +197,7 @@ class ScrolledFrame(ttk.Frame):
         scrollbar.pack(side="right", fill="y")
 
         # Dentro do canvas, é necessário um Frame
-        conteudo = ttk.Frame(canvas)
+        conteudo = ttk.Frame(canvas, **conteudo_kwargs)
         posx = parent.winfo_width() / 2
         canvas.create_window((posx, 0), width=width, window=conteudo, anchor="nw")
 
@@ -261,6 +261,7 @@ class Corretor():
         style.theme_use(TEMA)
         style.configure('H2.TLabel', font='Arial 14')
         style.configure('H1.TLabel', font='Arial 16')
+        style.configure('Fundo.TFrame', background='#bbb')
         style.configure('Verde.TButton', background='#9e9', bordercolor='#6b6',
             lightcolor='#beb')
         style.configure('Vermelho.TButton', background='#e99', bordercolor='#b66',
@@ -281,7 +282,10 @@ class Corretor():
         self.frame_principal = frame_principal
         frame_principal.pack(expand=True, fill=tk.BOTH)
         self._montar_frame_topo()
-        self.frame_questoes = ScrolledFrame(frame_principal, width=LARGURA_WIDGET_QUESTAO)
+        self.frame_questoes = ScrolledFrame(frame_principal,
+            width=LARGURA_WIDGET_QUESTAO,
+            conteudo_kwargs=dict(style='Fundo.TFrame'),
+            style='Fundo.TFrame')
         self.frame_questoes.pack(fill=tk.BOTH)
         self._montar_questoes()
     
