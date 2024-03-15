@@ -29,17 +29,19 @@ class Questao:
         self.correcoes = correcoes
     
     @classmethod
-    def ler_config(cls, config_questao: dict) -> 'Questao':
+    def ler_config(cls, config_questao: dict, valores_padrao: dict) -> 'Questao':
         '''Cria uma instância a partir do dict obtido da leitura do arquivo config.json.
         
         Parâmetros:
-        - `config_questao` é o dict de uma questao (um elemento da lista "questoes").'''
-        desc = config_questao['descricao']
-        comando = config_questao['comando']
+        - `config_questao` é o dict de uma questao (um elemento da lista "questoes").
+        - `valores_padrao` são valores padrão usados nas questões e correções caso não sejam informados nelas.
+        '''
+        desc = config_questao.get('descricao', valores_padrao.get('descricao'))
+        comando = config_questao.get('comando', valores_padrao.get('comando'))
         script = config_questao['script']
         correcoes: list[Correcao] = []
         for config_correcao in config_questao['correcoes']:
-            c = Correcao.ler_config(comando, script, config_correcao)
+            c = Correcao.ler_config(comando, script, config_correcao, valores_padrao)
             correcoes += [c]
         q = cls(desc, comando, script, correcoes)
         return q
@@ -69,12 +71,14 @@ class Correcao:
         self.msg_erro: str = msg_erro
 
     @classmethod
-    def ler_config(cls, comando: str, script: str, config_correcao: dict) -> 'Correcao':
+    def ler_config(cls, comando: str, script: str, config_correcao: dict, valores_padrao: dict) -> 'Correcao':
         '''Cria uma instância a partir do dict obtido da leitura do arquivo config.json.
         
         Parâmetros:
         - `comando` e `script` são os mesmos da `Questao`.
-        - `config_correcao` é o dict de uma correção (um elemento da lista "correcoes").'''
+        - `config_correcao` é o dict de uma correção (um elemento da lista "correcoes").
+        - `valores_padrao` são valores padrão usados nas questões e correções caso não sejam informados nelas.
+        '''
         params = dict(
             comando = comando,
             script = script,
@@ -82,7 +86,7 @@ class Correcao:
             cli_args = config_correcao.get('args', ''),
             func_expect = config_correcao['teste']['func_expect'],
             args_expect = config_correcao['teste'].get('args_expect', ''),
-            msg_erro = config_correcao['teste'].get('msg_erro'),
+            msg_erro = config_correcao['teste'].get('msg_erro', valores_padrao['msg_erro']),
         )
         correcao = cls(**params)
         return correcao
@@ -306,7 +310,8 @@ class Corretor():
         '''Monta os widgets das questões.'''
         self.widgets_questoes: list[QuestaoWidget] = []
         for questao_config in self.config['questoes']:
-            questao = Questao.ler_config(questao_config)
+            valores_padrao = self.config.get('valores_padrao', {})
+            questao = Questao.ler_config(questao_config, valores_padrao)
             qw = QuestaoWidget(self.frame_questoes.conteudo, self, questao)
             qw.pack(pady=PADDING*2)
             self.widgets_questoes += [qw]

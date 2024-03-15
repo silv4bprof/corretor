@@ -1,9 +1,12 @@
 {
     "titulo" : "Atividade 1",
+    "valores_padrao" : {
+        "comando" : "python",
+        "msg_erro" : "Mensagem de erro padrão."
+    },
     "questoes" : [
         {
             "descricao" : "Questão 1",
-            "comando" : "python",
             "script" : "q1.py",
             "correcoes" : [
                 {
@@ -27,15 +30,13 @@
                     "args" : "olá",
                     "teste" : {
                         "func_expect" : "testar_igual",
-                        "args_expect" : "isto deveria falhar",
-                        "msg_erro" : "Isto é uma mensagem de erro"
+                        "args_expect" : "isto deveria falhar"
                     }
                 }
             ]
         },
         {
             "descricao" : "Questão 2",
-            "comando" : "python",
             "script" : "q2.py",
             "correcoes" : [
                 {
@@ -48,7 +49,6 @@
         },
         {
             "descricao" : "Questão 3",
-            "comando" : "python",
             "script" : "arquivo_ausente.py",
             "correcoes" : [
                 { 
