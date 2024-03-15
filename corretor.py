@@ -15,80 +15,74 @@ TEMA = 'clam'
 class Questao:
     '''Uma questão para corrigir.'''
 
-    def __init__(self, descricao: str, comando: str, script: str, correcoes: list['Correcao']):
+    def __init__(self, descricao: str, correcoes: list['Correcao']):
         '''Construtor.
 
         Parâmetros:
         - `descricao` é uma descrição da questão.
-        - `comando` é o comando do terminal para executar o script da resposta.
-        - `script` é o script da resposta.
         - `correcoes` são os argumentos e verificações da saída do script para corrigir a questão.
         '''
         self.descricao = descricao
-        self.script = script
         self.correcoes = correcoes
     
     @classmethod
-    def ler_config(cls, config_questao: dict, valores_padrao: dict) -> 'Questao':
-        '''Cria uma instância a partir do dict obtido da leitura do arquivo config.json.
+    def ler_config(cls, config: dict) -> 'Questao':
+        '''Cria uma instância a partir do dict obtido da leitura do arquivo de configuração.
         
         Parâmetros:
-        - `config_questao` é o dict de uma questao (um elemento da lista "questoes").
-        - `valores_padrao` são valores padrão usados nas questões e correções caso não sejam informados nelas.
+        - `config`  são as configurações de uma questão (um elemento da lista "questoes").
         '''
-        desc = config_questao.get('descricao', valores_padrao.get('descricao'))
-        comando = config_questao.get('comando', valores_padrao.get('comando'))
-        script = config_questao['script']
+        # Chaves obrigatórias, que devem estar definidas na questão
+        desc = config['descricao']
+        # Lista de correções
         correcoes: list[Correcao] = []
-        for config_correcao in config_questao['correcoes']:
-            c = Correcao.ler_config(comando, script, config_correcao, valores_padrao)
+        for config_correcao in config['correcoes']:
+            # Adiciona valores padrão à correção que vieram da questão
+            aux = config_correcao
+            config_correcao = config.copy()
+            # Valores definidos na questão prevalecem
+            config_correcao.update(aux)
+            c = Correcao.ler_config(config_correcao)
             correcoes += [c]
-        q = cls(desc, comando, script, correcoes)
+        q = cls(desc, correcoes)
         return q
 
 
 class Correcao:
-    '''Uma correcao de uma questão.'''
+    '''Uma correção de uma questão.'''
 
-    def __init__(self, comando: str, script: str, input_: str, cli_args: str, func_expect, args_expect: list, msg_erro: str):
+    def __init__(self, script: str, msg_erro: str, comando: str,
+                 func_expect, args_expect: list = [],
+                 entrada: bytes = b'', args: str = '', **kwargs):
         '''Construtor.
         
         Parâmetros:
-        - `comando` é o comando do terminal para executar o script da resposta.
         - `script` é o script da resposta.
-        - `input_` é a entrada do teclado.
-        - `cli_args` são os argumentos da linha de comando salvos no atributo `args`.
+        - `msg_erro` mensagem de erro amigável ao usuário.
+        - `comando` é o comando do terminal para executar o script da resposta.
         - `func_expect` é a função que verifica a saída do script.
         - `args_expect` são os argumentos da função que verifica a saída do script.
-        - `msg_erro` mensagem de erro amigável ao usuário.
+        - `entrada` é a entrada do teclado.
+        - `args` são os argumentos da linha de comando.
         '''
         self.comando: str = comando
         self.script: str = script
-        self.input: str = input_.encode()
-        self.args: str = cli_args
+        self.entrada: bytes = entrada
+        self.args: str = args
         self.func_expect: str = func_expect
-        self.args_expect: str = args_expect
+        self.args_expect: list = args_expect
         self.msg_erro: str = msg_erro
 
     @classmethod
-    def ler_config(cls, comando: str, script: str, config_correcao: dict, valores_padrao: dict) -> 'Correcao':
+    def ler_config(cls, config: dict) -> 'Correcao':
         '''Cria uma instância a partir do dict obtido da leitura do arquivo config.json.
         
         Parâmetros:
-        - `comando` e `script` são os mesmos da `Questao`.
-        - `config_correcao` é o dict de uma correção (um elemento da lista "correcoes").
-        - `valores_padrao` são valores padrão usados nas questões e correções caso não sejam informados nelas.
+        - `config` são as configurações de uma correção (um elemento da lista "correcoes").
         '''
-        params = dict(
-            comando = comando,
-            script = script,
-            input_ = config_correcao.get('input', ''),
-            cli_args = config_correcao.get('args', ''),
-            func_expect = config_correcao['teste']['func_expect'],
-            args_expect = config_correcao['teste'].get('args_expect', ''),
-            msg_erro = config_correcao['teste'].get('msg_erro', valores_padrao['msg_erro']),
-        )
-        correcao = cls(**params)
+        if 'entrada' in config:
+            config['entrada'] = config['entrada'].encode()
+        correcao = cls(**config)
         return correcao
 
     @property
@@ -108,7 +102,7 @@ class Correcao:
             processo = subprocess.run(
                 [self.comando, self.script, self.args],
                 capture_output=True,
-                input=self.input,
+                input=self.entrada,
                 timeout=TIMEOUT)
             codigo = processo.returncode
             resposta = processo.stdout.decode()
@@ -129,6 +123,32 @@ class Correcao:
         else:
             erro = f'(Código {codigo})\n' + erro
         return codigo, resposta, erro
+
+
+class Atividade:
+    '''Uma atividade, com questões para corrigir.'''
+    def __init__(self, titulo: str, questoes: list[Questao]):
+        self.titulo: str = titulo
+        self.questoes: list[Questao] = questoes
+    
+    @classmethod
+    def ler_config(cls, config: dict) -> 'Atividade':
+        '''Lê uma arquivo de configuração recursivamente.
+
+        Parâmetros:
+        - `config` é o dicionário lido do arquivo de configuração.
+        '''
+        titulo = config['titulo']
+        questoes: list[Questao] = []
+        for config_questao in config['questoes']:
+            # Adiciona valores padrão à questão que vieram da atividade
+            aux = config_questao
+            config_questao = config.copy()
+            # Valores definidos na questão prevalecem
+            config_questao.update(aux)
+            questoes += [Questao.ler_config(config_questao)]
+        return cls(titulo, questoes)
+        
 
 
 # Funções de correcao
@@ -277,10 +297,12 @@ class Corretor():
         style.configure('Amarelo.TButton', background='#ee9', bordercolor='#bb6',
             lightcolor='#eeb', darkcolor='#993')
 
-        # Lê o arquivo de configuração
-        self.config = json.load(open(caminho_config, encoding='utf-8'))
+        # Lê o arquivo de configuração para criar a Atividade
+        config = json.load(open(caminho_config, encoding='utf-8'))
+        self.atividade = Atividade.ler_config(config)
+
         # Configura a janela
-        janela.title(f"Corretor Automático - {self.config['titulo']}")
+        janela.title(f"Corretor Automático - {self.atividade.titulo}")
         janela.geometry("1024x600")
 
         # Montagem da interface
@@ -310,9 +332,7 @@ class Corretor():
     def _montar_questoes(self):
         '''Monta os widgets das questões.'''
         self.widgets_questoes: list[QuestaoWidget] = []
-        for questao_config in self.config['questoes']:
-            valores_padrao = self.config.get('valores_padrao', {})
-            questao = Questao.ler_config(questao_config, valores_padrao)
+        for questao in self.atividade.questoes:
             qw = QuestaoWidget(self.frame_questoes.conteudo, self, questao)
             qw.pack(pady=PADDING*2)
             self.widgets_questoes += [qw]
@@ -485,12 +505,14 @@ class CorrecaoWidget(ttk.Frame):
         text_entrada.grid(column=0, row=row, sticky='w', columnspan=2,
             pady=(0, PADDING))
         text_entrada.delete(0.0, 'end')  # Limpa o texto
-        entrada = self.correcao.input.decode()
-        text_entrada.insert('end', entrada)  # Insere a entrada
-        altura = len(entrada.split('\n'))  # Ajusta a altura
-        text_entrada.configure(
-            height=altura,
-            state=tk.DISABLED)  # Desabilita a edição
+        if self.correcao.entrada:
+            entrada = self.correcao.entrada.decode()
+            text_entrada.insert('end', entrada)  # Insere a entrada
+            # Ajusta a altura
+            altura = len(entrada.split('\n'))
+            text_entrada.configure(height=altura)
+        # Desabilita a edição
+        text_entrada.configure(state=tk.DISABLED)
         self.text_entrada = text_entrada
     
     def _montar_resultado(self):

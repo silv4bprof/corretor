@@ -1,37 +1,30 @@
 {
     "titulo" : "Atividade 1",
-    "valores_padrao" : {
-        "comando" : "python",
-        "msg_erro" : "Mensagem de erro padrão."
-    },
+    "comando" : "python",
+    "msg_erro" : "Mensagem de erro padrão.",
+    "pontos" : 0,
     "questoes" : [
         {
             "descricao" : "Questão 1",
             "script" : "q1.py",
             "correcoes" : [
                 {
-                    "input" : "hello\n",
+                    "entrada" : "hello\n",
                     "args" : "hello",
-                    "teste" : {
-                        "func_expect" : "testar_igual",
-                        "args_expect" : "hello"
-                    }
+                    "func_expect" : "testar_igual",
+                    "args_expect" : "hello"
                 },
                 {
-                    "input" : "não\n",
+                    "entrada" : "não\n",
                     "args" : "não",
-                    "teste" : {
-                        "func_expect" : "testar_igual",
-                        "args_expect" : "não"
-                    }
+                    "func_expect" : "testar_igual",
+                    "args_expect" : "não"
                 },
                 {
-                    "input" : "olá\n",
+                    "entrada" : "olá\n",
                     "args" : "olá",
-                    "teste" : {
-                        "func_expect" : "testar_igual",
-                        "args_expect" : "isto deveria falhar"
-                    }
+                    "func_expect" : "testar_igual",
+                    "args_expect" : "isto deveria falhar"
                 }
             ]
         },
@@ -40,10 +33,8 @@
             "script" : "q2.py",
             "correcoes" : [
                 {
-                    "teste" : {
-                        "func_expect" : "testar_igual",
-                        "msg_erro" : "isto deveria dar erro de sintaxe"
-                    }
+                    "func_expect" : "testar_igual",
+                    "msg_erro" : "isto deveria dar erro de sintaxe"
                 }
             ]
         },
@@ -52,8 +43,7 @@
             "script" : "arquivo_ausente.py",
             "correcoes" : [
                 { 
-                    "input" : "", "args" : "",
-                    "teste" : { "func_expect" : "testar_igual" }
+                    "func_expect" : "testar_igual"
                 }
             ]
         }
