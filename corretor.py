@@ -268,7 +268,7 @@ class Corretor():
         style.theme_use(TEMA)
         style.configure('H2.TLabel', font='Arial 14')
         style.configure('H1.TLabel', font='Arial 16')
-        style.configure('Fundo.TFrame', background='#bbb')
+        style.configure('Fundo.TFrame', background='#bba')
         style.configure('Verde.TButton', background='#9e9', bordercolor='#6b6',
             lightcolor='#beb', darkcolor='#393')
         style.configure('Vermelho.TButton', background='#e99', bordercolor='#b66',
