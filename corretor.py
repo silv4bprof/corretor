@@ -72,6 +72,8 @@ class Correcao:
         self.script: str = script
         self.entrada: bytes = entrada
         self.args: str = args
+        # TODO: Unificar func_expect e args_expect num argumento só.
+        # Isso ajuda a não esquecer um ou outro.
         self.func_expect: str = func_expect
         self.args_expect: list = args_expect
         self.msg_erro: str = msg_erro
