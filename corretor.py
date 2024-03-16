@@ -1,4 +1,4 @@
-import json, platform, subprocess, tkinter as tk
+import json, os, platform, subprocess, tkinter as tk
 
 from tkinter import ttk
 from tkinter.messagebox import showerror
@@ -184,6 +184,7 @@ def testar_regex(resultado: str, regex: str) -> tuple[bool, str]:
 # Constantes
 PADDING = 5
 LARGURA_WIDGET_QUESTAO = 694
+DIMENSOES_JANELA = "1024x600"
 
 # Classes
 
@@ -304,12 +305,18 @@ class Corretor():
             lightcolor='#eeb', darkcolor='#993')
 
         # Lê o arquivo de configuração para criar a Atividade
+        if not os.path.isfile(caminho_config):
+            janela.title(f"Corretor Automático")
+            janela.geometry(DIMENSOES_JANELA)
+            showerror("Erro", 'Arquivo de configuração' + \
+                      f' "{caminho_config}" não encontrado.')
+            exit()
         config = json.load(open(caminho_config, encoding='utf-8'))
         self.atividade = Atividade.ler_config(config)
 
         # Configura a janela
         janela.title(f"Corretor Automático - {self.atividade.titulo}")
-        janela.geometry("1024x600")
+        janela.geometry(DIMENSOES_JANELA)
 
         # Montagem da interface
         # O frame principal contém todos os elementos da tela
