@@ -6,7 +6,7 @@ from tkinter.messagebox import showerror
 # MODELO
 
 # Constantes
-TIMEOUT = 2
+TIMEOUT = 10
 SISTEMA = platform.system().lower()
 TEMA = 'clam'
 
