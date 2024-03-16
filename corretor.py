@@ -15,15 +15,17 @@ TEMA = 'clam'
 class Questao:
     '''Uma questão para corrigir.'''
 
-    def __init__(self, descricao: str, correcoes: list['Correcao']):
+    def __init__(self, descricao: str, pontos: int, correcoes: list['Correcao']):
         '''Construtor.
 
         Parâmetros:
         - `descricao` é uma descrição da questão.
+        - `pontos` são os pontos (nota) da questão.
         - `correcoes` são os argumentos e verificações da saída do script para corrigir a questão.
         '''
         self.descricao = descricao
         self.correcoes = correcoes
+        self.pontos = pontos
     
     @classmethod
     def ler_config(cls, config: dict) -> 'Questao':
@@ -34,6 +36,7 @@ class Questao:
         '''
         # Chaves obrigatórias, que devem estar definidas na questão
         desc = config['descricao']
+        pontos = config['pontos']
         # Lista de correções
         correcoes: list[Correcao] = []
         for config_correcao in config['correcoes']:
@@ -44,7 +47,7 @@ class Questao:
             config_correcao.update(aux)
             c = Correcao.ler_config(config_correcao)
             correcoes += [c]
-        q = cls(desc, correcoes)
+        q = cls(desc, pontos, correcoes)
         return q
 
 
@@ -345,11 +348,15 @@ class Corretor():
     def atualizar(self):
         '''Atualiza este widget.'''
         contador_corretas = 0
-        for q in self.widgets_questoes:
-            if q.correta:
+        nota = 0
+        for qw in self.widgets_questoes:
+            if qw.correta:
                 contador_corretas += 1
+                nota += qw.questao.pontos
         total = len(self.widgets_questoes)
-        self.label_corretas.configure(text=f'Corretas: {contador_corretas} de {total}')
+        texto_resultado = f'Corretas: {contador_corretas} de {total}' + \
+            f' ({nota} pts)'
+        self.label_corretas.configure(text=texto_resultado)
         if contador_corretas == total:
             self.botao_corrigir_todas.configure(style='Verde.TButton')
         elif contador_corretas == 0:
@@ -386,7 +393,10 @@ class QuestaoWidget(ttk.Frame):
         '''Monta a primeira linha deste widget, que contém a descrição da questão, o botão para corrigir e o label do resultado.'''
         frame1 = ttk.Frame(self)
         frame1.grid(columnspan=2, sticky='news')
-        self.label_decricao = ttk.Label(frame1, text=self.questao.descricao, style='H1.TLabel')
+        desc = self.questao.descricao
+        if self.questao.pontos >= 0:
+            desc += f' ({self.questao.pontos} pts)'
+        self.label_decricao = ttk.Label(frame1, text=desc, style='H1.TLabel')
         self.label_decricao.pack(side=tk.LEFT, fill='x', expand=True, anchor='n',
             padx=(PADDING*3, 0), pady=(PADDING*3, 0))
         
@@ -394,7 +404,7 @@ class QuestaoWidget(ttk.Frame):
         frame2.pack(side=tk.RIGHT)
         self.botao_corrigir = ttk.Button(frame2, text='Corrigir Questão',
             command=self._corrigir_questao, padding=PADDING*2)
-        self.botao_corrigir.pack(side=tk.TOP,
+        self.botao_corrigir.pack(side=tk.TOP, anchor='e',
             padx=(0, PADDING*3), pady=(PADDING*3, 0))
         self.label_resultado = ttk.Label(frame2, text=f'')
         self.label_resultado.pack(side=tk.BOTTOM, anchor='e',
@@ -419,6 +429,8 @@ class QuestaoWidget(ttk.Frame):
             if c.resultado == 'Correta':
                 self.contador_corretas += 1
         texto_corretas = f'Corretas: {self.contador_corretas} de {len(self.widgets_correcoes)}'
+        if self.contador_corretas == len(self.widgets_correcoes):
+            texto_corretas += f' (+{self.questao.pontos} pts)'
         self.label_resultado.configure(text=f'{texto_corretas}')
         estilo = 'TButton'
         if self.contador_corretas == len(self.widgets_correcoes):
