@@ -56,7 +56,7 @@ class Correcao:
 
     def __init__(self, script: str, msg_erro: str, comando: str,
                  func_expect, args_expect: list = [],
-                 entrada: bytes = b'', args: str = '', **kwargs):
+                 entrada: str = '', args: str = '', **kwargs):
         '''Construtor.
         
         Parâmetros:
@@ -70,7 +70,7 @@ class Correcao:
         '''
         self.comando: str = comando
         self.script: str = script
-        self.entrada: bytes = entrada
+        self.entrada: str = entrada
         self.args: str = args
         # TODO: Unificar func_expect e args_expect num argumento só.
         # Isso ajuda a não esquecer um ou outro.
@@ -85,8 +85,6 @@ class Correcao:
         Parâmetros:
         - `config` são as configurações de uma correção (um elemento da lista "correcoes").
         '''
-        if 'entrada' in config:
-            config['entrada'] = config['entrada'].encode()
         correcao = cls(**config)
         return correcao
 
@@ -108,10 +106,13 @@ class Correcao:
                 [self.comando, self.script, self.args],
                 capture_output=True,
                 input=self.entrada,
+                text=True,
+                encoding='utf-8',
+                errors='ignore',
                 timeout=TIMEOUT)
             codigo = processo.returncode
-            resposta = processo.stdout.decode()
-            erro = processo.stderr.decode()
+            resposta = processo.stdout
+            erro = processo.stderr
         except subprocess.TimeoutExpired as e:
             codigo = 1
             resposta = e.stdout.decode() if e.stdout else '\n'
@@ -478,6 +479,9 @@ class CorrecaoWidget(ttk.Frame):
             saida = saida  # Remove a linha extra que sempre vem
             res += f'Saída:\n{saida}'
         if erro:
+            # Adiciona quebra de linha antes do erro
+            if len(res) > 0 and not res.endswith('\n'):
+                res += '\n'
             res += f'Erro:\n{erro}'
         text.configure(state=tk.NORMAL)  # Habilita a caixa de texto para edição
         text.delete(0.0, 'end')  # Limpa o texto
@@ -520,7 +524,7 @@ class CorrecaoWidget(ttk.Frame):
             pady=(0, PADDING))
         text_entrada.delete(0.0, 'end')  # Limpa o texto
         if self.correcao.entrada:
-            entrada = self.correcao.entrada.decode()
+            entrada: str = self.correcao.entrada
             text_entrada.insert('end', entrada)  # Insere a entrada
             # Ajusta a altura
             altura = len(entrada.split('\n'))
@@ -531,8 +535,8 @@ class CorrecaoWidget(ttk.Frame):
     
     def _montar_resultado(self):
         row = 4
-        ttk.Label(self, text=f'Resultado', style='H2.TLabel').grid(column=0, row=row, sticky='w',
-            pady=(0, PADDING))
+        ttk.Label(self, text=f'Resultado', style='H2.TLabel').grid(
+            column=0, row=row, sticky='w', pady=(0, PADDING))
         row += 1
         self.text_resultado = ScrolledText(self, wrap=tk.WORD, 
                                     width=80, height=1, state=tk.DISABLED)
