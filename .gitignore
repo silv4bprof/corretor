@@ -162,3 +162,4 @@ cython_debug/
 # Facilitadores
 
 *.ps1
+.vscode/
