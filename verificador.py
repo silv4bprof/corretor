@@ -88,12 +88,20 @@ class Verificador:
         print("Verificando diferenças ...")
         texto_esquerda = self.texto_esquerda.get(1.0, END)
         texto_direita = self.texto_direita.get(1.0, END)
-        seq = df.SequenceMatcher(None, texto_esquerda, texto_direita)
-        seq = seq.ratio() * 100
+        res = df.SequenceMatcher(None, texto_esquerda, texto_direita)
+        seq = res.ratio() * 100
         resultado = f"Ratio: {seq:.2f}%"
         print(resultado)
-        # self.label_resultado["text"] = resultado
         self.label_resultado.configure(text=resultado)
+
+        if seq > 80:
+            cor_texto = "#FF3232"
+        elif seq < 50:
+            cor_texto = "#6AA84F"
+        else:
+            cor_texto = "#F1C232"
+
+        self.label_resultado.configure(text_color=cor_texto)
 
 
 if __name__ == "__main__":
