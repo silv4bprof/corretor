@@ -3,7 +3,7 @@ import tkinter as tk
 import difflib as df
 
 from customtkinter import *
-from tkinter.messagebox import showerror
+from utils import vincular_rolagem_textbox as vr
 
 # Constantes
 TIMEOUT = 10
@@ -13,6 +13,7 @@ PADDING = 5
 LARGURA_WIDGET_QUESTAO = 694
 DIMENSOES_JANELA = "1024x700"
 FONTE_NATIVA = "Courier"
+TAMANHO_NATIVO = 14
 
 set_default_color_theme("blue")
 
@@ -61,17 +62,23 @@ class Verificador:
 
         # Adicionando campos de texto
         self.texto_esquerda = CTkTextbox(
-            frame_campos_de_texto, width=40, height=10, font=(FONTE_NATIVA, 16)
+            frame_campos_de_texto,
+            width=40,
+            height=10,
+            font=(FONTE_NATIVA, TAMANHO_NATIVO),
         )
         self.texto_esquerda.pack(
-            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10
+            side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5
         )
 
         self.texto_direita = CTkTextbox(
-            frame_campos_de_texto, width=40, height=10, font=(FONTE_NATIVA, 16)
+            frame_campos_de_texto,
+            width=40,
+            height=10,
+            font=(FONTE_NATIVA, TAMANHO_NATIVO),
         )
         self.texto_direita.pack(
-            side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=10, pady=10
+            side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=5, pady=5
         )
 
     def _montar_frame_resultado(self):

@@ -4,6 +4,8 @@
 
 - [ ] Similaridade de Código: Além de verificar se os textos são idênticos, você pode calcular a similaridade entre os códigos utilizando técnicas como Distância de Levenshtein, similaridade de Jaccard, ou similaridade de cosseno.
 
+  - [ ] [Navegando pela Similaridade de Strings com Python: Distância Levenshtein e Damerau-Levenshtein.](https://www.linkedin.com/pulse/navegando-pela-similaridade-de-strings-com-python-dist%C3%A2ncia-gaia-/?originalSubdomain=pt)
+
 - [ ] Comentários e Documentação: Compare a quantidade e semelhança de comentários e documentação nos códigos. Códigos muito similares provavelmente terão comentários semelhantes ou mesmo idênticos.
 
 - [ ] Estrutura e Estilo de Codificação: Verifique se os códigos têm estruturas similares, como o uso de loops, condicionais, funções, etc. Consistência no estilo de codificação também pode ser um indicativo de similaridade.
